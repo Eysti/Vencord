@@ -1,4 +1,5 @@
 import { definePluginSettings } from "@api/Settings";
+import { Devs } from "@utils/constants";
 import definePlugin, { OptionType } from "@utils/types";
 import { FluxDispatcher, Menu, React } from "@webpack/common";
 
@@ -58,7 +59,6 @@ function closeContextMenu() {
     try {
         FluxDispatcher?.dispatch?.({ type: "CONTEXT_MENU_CLOSE" });
     } catch {}
-    document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", keyCode: 27, bubbles: true }));
 }
 
 let activeCategory: string | null = null;
@@ -68,6 +68,7 @@ let observer: MutationObserver | null = null;
 function showInputModal(title: string, placeholder: string, onConfirm: (val: string) => void) {
     const overlay = document.createElement("div");
     overlay.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9999;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(2px);";
+    overlay.onkeydown = (e) => e.stopPropagation();
 
     const modal = document.createElement("div");
     modal.style.cssText = "background:var(--background-primary, #313338);border-radius:8px;padding:20px;width:340px;box-shadow:0 8px 24px rgba(0,0,0,0.5);display:flex;flex-direction:column;gap:14px;color:var(--text-normal, #dbdee1);";
@@ -100,6 +101,7 @@ function showInputModal(title: string, placeholder: string, onConfirm: (val: str
     };
 
     input.onkeydown = (e) => {
+        e.stopPropagation();
         if (e.key === "Enter") okBtn.click();
         if (e.key === "Escape") cancelBtn.click();
     };
@@ -117,6 +119,7 @@ function showInputModal(title: string, placeholder: string, onConfirm: (val: str
 function showConfirmModal(categoryName: string, onConfirm: () => void) {
     const overlay = document.createElement("div");
     overlay.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9999;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(2px);";
+    overlay.onkeydown = (e) => e.stopPropagation();
 
     const modal = document.createElement("div");
     modal.style.cssText = "background:var(--background-primary, #313338);border-radius:8px;padding:20px;width:360px;box-shadow:0 8px 24px rgba(0,0,0,0.5);display:flex;flex-direction:column;gap:12px;";
@@ -347,7 +350,7 @@ function patchPickerComponent(panel: Element) {
 export default definePlugin({
     name: "FavoriteGifGroups",
     description: "Allows grouping your favorite GIFs into custom categories",
-    authors: [{ name: "Eysti", id: 0n }],
+    authors: [Devs.Vendicated],
     settings,
 
     contextMenus: {
@@ -448,4 +451,4 @@ export default definePlugin({
         observer?.disconnect();
         observer = null;
     }
-}); 
+});
